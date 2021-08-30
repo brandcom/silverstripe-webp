@@ -1,0 +1,19 @@
+{
+    "name": "jbennecker/silverstripe-webp",
+    "license": "MIT",
+    "description": "",
+    "type": "silverstripe-vendormodule",
+    "keywords": [
+        "silverstripe",
+        "webp"
+    ],
+    "require": {
+        "silverstripe/framework": "^4",
+        "rosell-dk/webp-convert": "^2.6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "jbennecker\\Webp\\": "src/"
+        }
+    }
+}
