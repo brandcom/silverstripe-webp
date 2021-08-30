@@ -9,6 +9,16 @@ use WebPConvert\WebPConvert;
  */
 class WebpExtension extends \SilverStripe\ORM\DataExtension
 {
+    /**
+     * Webp
+     *
+     * Returns the URL for a Webp image.
+     *
+     * If there is no Webp version yet, an existing image is created.
+     *
+     * @param integer $width
+     * @return string|null
+     */
     public function Webp($width=1920): ?string
     {
         $scaledImage = $this->owner->scaleMaxWidth($width);
