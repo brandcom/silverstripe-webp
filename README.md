@@ -5,6 +5,7 @@ The Plugin integrates simple WebP image conversion into Silverstripe.
 ## Requirements
 
 -   SilverStripe 4.x
+-   rosell-dk/webp-convert ^2.6
 
 ## Install
 
