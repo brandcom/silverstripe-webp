@@ -1,7 +1,6 @@
 <?php
 namespace jbennecker\Webp;
 
-use SilverStripe\View\HTML;
 use WebPConvert\WebPConvert;
 
 /**
