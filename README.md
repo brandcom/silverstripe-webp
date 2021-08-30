@@ -24,11 +24,11 @@ SilverStripe\Assets\Image:
 
 Convert images on the go in a Template, e.g. `Example.ss`.
 
-### Create `<picture>` element
+### Create a responsive `<picture>` element
 
-You can create picture elements with Webp sources and fallback sources:
+You can create picture elements with responsive Webp and fallback sources:
 
-`$Image.WebpPicture('params', ...widths)`
+`$Image.WebpPicture(string $params, int ...$widths)`
 
 e.g.
 
@@ -59,6 +59,8 @@ This will create the following html output (for .jpg input):
     <img src="/.../path/ABXimage__ScaleMaxWidth....jpg" class="example" width="100" height="50" alt="[$Image.Title]" />
 </picture>
 ```
+
+The fallback `<img>` will have the average width of your defined `...$widths`.
 
 _Note:_ The `alt` parameter is set automatically as no variables can be added to the `$params` string.
 
