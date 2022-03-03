@@ -35,7 +35,6 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
         $options = [];
 
         if (!file_exists($destinationPath) || filemtime($source) > filemtime($destinationPath)) {
-
             try {
                 WebPConvert::convert($source, $destinationPath, $options);
             } catch (Exception $e) {
@@ -117,6 +116,42 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
                     >
                     <img
                         src="' . $this->owner->ScaleMaxWidth(array_sum($widths) / count($widths))->Url . '" '
+                        . $params
+                        . ' alt="' . $this->owner->Title . '"
+                    >
+                </picture>';
+        }
+        return '';
+    }
+
+    /**
+     * WebpLazyPicture
+     *
+     * In Example.ss:
+     * Image.WebpLazyPicture('class="lazy image bg-image" width="550" height="370"', 170, 550, 950, 1200).RAW
+     *
+     * Note: Needs frontend library based on IntersectionObserver API.
+     * Note: Must me used in template with the .RAW method to prevent the HTML from being escaped.
+     *
+     * @param string $params HTML Parameters for the img tag, except alt="". Do not use $ViewVariables in the Template as they won't be evaluated.
+     * @param integer ...$widths
+     * @return string
+     */
+    public function WebpLazyPicture(string $params, int ...$widths) : string
+    {
+        if ($this->owner->Link()) {
+            return '
+                <picture>
+                    <source
+                        type="image/webp"
+                        data-srcset="' . $this->WebpSet(...$widths) . '"
+                    >
+                    <source
+                        type="' . $this->owner->getMimeType() . '"
+                        data-srcset="' . $this->SrcSet(...$widths) . '"
+                    >
+                    <img
+                        data-src="' . $this->owner->ScaleMaxWidth(array_sum($widths) / count($widths))->Url . '" '
                         . $params
                         . ' alt="' . $this->owner->Title . '"
                     >
