@@ -32,7 +32,7 @@ class Picture extends ViewableData
     ];
 
     private static $default_config = [
-        'formats' => ['JPEG', 'WebP'],
+        'formats' => ['WebP', 'JPEG'],
         'sizes' => '100vw',
         'widths' => [350, 750, 1500],
     ];
