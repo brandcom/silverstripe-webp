@@ -80,7 +80,7 @@ class Picture extends ViewableData
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/sizes#html
      *
-     * E.g. "100vw, (min-width: 640px) 50vw"
+     * E.g. "(min-width: 280px) 100vw, (min-width: 640px) 50vw"
      * -> The Picture is supposed to be shown fullscreen on smaller screens. On screens largen than 640px,
      * the image is shown at 50% screen width.
      */
