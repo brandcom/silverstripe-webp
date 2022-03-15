@@ -16,5 +16,11 @@
         "psr-4": {
             "jbennecker\\Webp\\": "src/"
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "silverstripe/vendor-plugin": true
+        }
     }
 }

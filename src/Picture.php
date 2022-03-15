@@ -4,8 +4,7 @@ namespace jbennecker\Webp;
 
 use SilverStripe\Assets\Image;
 use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Core\CustomMethods;
-use SilverStripe\Dev\Debug;
+use SilverStripe\View\HTML;
 use SilverStripe\View\ViewableData;
 use WebPConvert\WebPConvert;
 
@@ -15,10 +14,22 @@ class Picture extends ViewableData
 
     private Image $image;
 
-    private string $test;
+    private array $formats;
+
+    private array $widths;
+
+    private string $sizes;
+
+    private array $params;
 
     private static $casting = [
         'forTemplate' => 'HtmlText',
+    ];
+
+    private static $default_config = [
+        'formats' => ['JPEG', 'WebP'],
+        'sizes' => '100vw',
+        'widths' => [350, 750, 1500],
     ];
 
     public function __construct(Image $image)
@@ -28,24 +39,94 @@ class Picture extends ViewableData
         $config = self::config();
 
         $this->image = $image;
-        $this->test = "123";
+        $this->formats = $config->formats ?? self::$default_config['formats'];
+        $this->widths = $config->widths ?? self::$default_config['widths'];
+        $this->sizes = $config->sizes ?? self::$default_config['sizes'];
+        $this->params = $this->getDefaultParams();
     }
 
-    public function getTest(): string
+    /**
+     * Currently supported:
+     *  - JPEG
+     *  - WebP
+     *
+     * You may override the default (JPEG, WebP) here, to e.g. disable WebP generation.
+     */
+    public function setFormats(string ...$formats): Picture
     {
-        return "Test";
-    }
+        $this->formats = $formats;
 
-    public function setTest(string $test="default"): Picture
-    {
-        $this->test = $test;
-        Debug::dump($this->test);
         return $this;
     }
 
+    public function setWidths(int ...$widths): Picture
+    {
+        sort($widths);
+        $this->widths = $withs;
+
+        return $this;
+    }
+
+    /**
+     * Set the html sizes attribute. Defaults to 100vw.
+     *
+     * @link https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/sizes#html
+     *
+     * E.g. "100vw, (min-width: 640px) 50vw"
+     * -> The Picture is supposed to be shown fullscreen on smaller screens. On screens largen than 640px,
+     * the image is shown at 50% screen width.
+     */
+    public function setSizes(string $sizes): Picture
+    {
+        $this->sizes = $sizes;
+
+        return $this;
+    }
+
+    /**
+     * Set parameters for the <img> tag
+     */
+    public function setParam(string $param, string $value): Picture
+    {
+        $this->params[$param] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Renders the html <picture> element.
+     */
     public function forTemplate(): string
     {
-        return $this->image->ScaleMaxWidth(230);
+        return $this->createPictureElement();
+    }
+
+    private function getDefaultParams(): array
+    {
+        return [
+            'alt' => $this->image->getTitle(),
+            'width' => $this->image->getWidth(),
+            'height' => $this->image->getHeight(),
+            'class' => 'bc-picture',
+        ];
+    }
+
+    private function createPictureElement(): string
+    {
+        $picture_content = '';
+
+        foreach ($this->formats as $format) {
+            $picture_content .= $this->createSourceElement($format);
+        }
+
+        $picture_content .= HTML::createTag('img', $this->params);
+
+        return HTML::createTag('picture', [], $picture_content);
+    }
+
+    private function createSourceElement(string $format): string
+    {
+        return '';
     }
 
     /**
@@ -58,7 +139,7 @@ class Picture extends ViewableData
      * @param integer $width
      * @return string|null
      */
-    public function Webp($width=1920): ?string
+    private function convertToWebp($width = 1920): ?string
     {
         $scaledImage = $this->owner->scaleMaxWidth($width);
         if (!$scaledImage) {
@@ -70,7 +151,7 @@ class Picture extends ViewableData
             return null;
         }
 
-        $destinationLink = '/webp' . $this->owner->scaleMaxWidth($width)->Link() . '-' . $width. 'px.webp';
+        $destinationLink = '/webp' . $this->owner->scaleMaxWidth($width)->Link() . '-' . $width . 'px.webp';
         $destinationPath = PUBLIC_PATH . $destinationLink;
         $options = [];
 
@@ -102,7 +183,7 @@ class Picture extends ViewableData
      * @param [type] ...$widths
      * @return string|null
      */
-    public function WebpSet(...$widths) : ?string
+    public function WebpSet(...$widths): ?string
     {
         sort($widths);
         $links = [];
@@ -120,7 +201,7 @@ class Picture extends ViewableData
      * @param [type] ...$widths
      * @return string|null
      */
-    public function SrcSet(...$widths) : ?string
+    public function SrcSet(...$widths): ?string
     {
         sort($widths);
         $links = [];
@@ -142,7 +223,7 @@ class Picture extends ViewableData
      * @param integer ...$widths
      * @return string
      */
-    public function WebpPicture(string $params, int ...$widths) : string
+    public function WebpPicture(string $params, int ...$widths): string
     {
         if ($this->owner->Link()) {
             return '
