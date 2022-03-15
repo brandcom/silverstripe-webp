@@ -21,12 +21,12 @@ class WebPConverter
 
         $this->input_path = $input_path;
 
-        $this->folder = $options['folder'] ?? 'webp/';
+        $this->folder = $options['folder'] ?? '/webp';
     }
 
     public function convert($options = [], $logger = null): bool
     {
-        if (file_exists($this->getPath()) || filemtime($this->input_path) < filemtime($this->getPath())) {
+        if (file_exists($this->getPath()) && filemtime($this->input_path) < filemtime($this->getPath())) {
 
             return true;
         }
