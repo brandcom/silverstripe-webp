@@ -64,6 +64,9 @@ class Picture extends ViewableData
         return $this;
     }
 
+    /**
+     * @param int[] $widths
+     */
     public function setWidths(int ...$widths): Picture
     {
         sort($widths);
@@ -122,6 +125,11 @@ class Picture extends ViewableData
      * Renders the html <picture> element.
      */
     public function forTemplate(): string
+    {
+        return $this->getHtml();
+    }
+
+    public function getHtml(): string
     {
         return $this->createPictureElement();
     }
