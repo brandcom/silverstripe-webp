@@ -8,6 +8,7 @@
         "webp"
     ],
     "require": {
+        "php": "^7.4 || ^8.0",
         "silverstripe/framework": "^4",
         "rosell-dk/webp-convert": "^2.6.0"
     },

@@ -2,12 +2,18 @@
 namespace jbennecker\Webp;
 
 use WebPConvert\WebPConvert;
+use \SilverStripe\ORM\DataExtension;
 
 /**
  * @property \SilverStripe\Assets\Image owner
  */
-class WebpExtension extends \SilverStripe\ORM\DataExtension
+class WebpExtension extends DataExtension
 {
+    public function getPicture()
+    {
+        return Picture::create($this->owner);
+    }
+
     /**
      * Webp
      *
@@ -38,7 +44,7 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
 
             try {
                 WebPConvert::convert($source, $destinationPath, $options);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 return null;
             }
         }
