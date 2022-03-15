@@ -6,7 +6,6 @@ use SilverStripe\Assets\Image;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\View\HTML;
 use SilverStripe\View\ViewableData;
-use WebPConvert\WebPConvert;
 
 class Picture extends ViewableData
 {
@@ -16,8 +15,14 @@ class Picture extends ViewableData
 
     private array $formats;
 
+    /**
+     * List of integers / widths for <source> elements
+     */
     private array $widths;
 
+    /**
+     * <source sizes="..."> parameter content
+     */
     private string $sizes;
 
     private array $params;
@@ -62,7 +67,7 @@ class Picture extends ViewableData
     public function setWidths(int ...$widths): Picture
     {
         sort($widths);
-        $this->widths = $withs;
+        $this->widths = $widths;
 
         return $this;
     }
@@ -94,6 +99,26 @@ class Picture extends ViewableData
     }
 
     /**
+     * Set the alt parameter for the <img> tag
+     */
+    public function setAlt(string $value): Picture
+    {
+        $this->params['alt'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the class parameter for the <img> tag
+     */
+    public function setCss(string $value): Picture
+    {
+        $this->params['class'] = $value;
+
+        return $this;
+    }
+
+    /**
      * Renders the html <picture> element.
      */
     public function forTemplate(): string
@@ -116,133 +141,72 @@ class Picture extends ViewableData
         $picture_content = '';
 
         foreach ($this->formats as $format) {
-            $picture_content .= $this->createSourceElement($format);
+
+            $el = $this->createSourceElement($format);
+
+            if (!$el) {
+                continue;
+            }
+
+            $picture_content .= $el;
         }
 
-        $picture_content .= HTML::createTag('img', $this->params);
+        $picture_content .= $this->createImgElement();
 
         return HTML::createTag('picture', [], $picture_content);
     }
 
+    private function createImgElement(): string
+    {
+        $params = $this->params;
+        $params['src'] = $this->image->ScaleWidth(reset($this->widths))->getURL();
+
+        return HTML::createTag('img', $params);
+    }
+
     private function createSourceElement(string $format): string
     {
-        return '';
-    }
+        $srcset = [];
+        foreach ($this->widths as $width) {
 
-    /**
-     * Webp
-     *
-     * Returns the URL for a Webp image.
-     *
-     * If there is no Webp version yet, an existing image is created.
-     *
-     * @param integer $width
-     * @return string|null
-     */
-    private function convertToWebp($width = 1920): ?string
-    {
-        $scaledImage = $this->owner->scaleMaxWidth($width);
-        if (!$scaledImage) {
-            return null;
-        }
+            $scaled = $this->image->ScaleWidth($width)->getURL();
 
-        $source = PUBLIC_PATH . $scaledImage->Link();
-        if (!file_exists($source)) {
-            return null;
-        }
+            switch (mb_strtolower($format)) {
+                case 'jpeg':
+                case 'jpg':
+                    $path = $scaled;
+                    break;
+                case 'webp':
+                    $converter = new WebPConverter(PUBLIC_PATH . $scaled);
+                    if (!$converter->convert()) {
+                        continue 2;
+                    }
 
-        $destinationLink = '/webp' . $this->owner->scaleMaxWidth($width)->Link() . '-' . $width . 'px.webp';
-        $destinationPath = PUBLIC_PATH . $destinationLink;
-        $options = [];
-
-        if (!file_exists($destinationPath) || filemtime($source) > filemtime($destinationPath)) {
-
-            try {
-                WebPConvert::convert($source, $destinationPath, $options);
-            } catch (\Exception $e) {
-                return null;
+                    $path = str_replace(PUBLIC_PATH, '', $converter->getPath());
+                    break;
             }
-        }
-        return $destinationLink;
-    }
 
-    /**
-     * WebpSet
-     *
-     * For use in <img> tag:
-     * <img
-     *  src="$BackgroundImage.ScaleWidth(1200).Link"
-     *  srcset="$BackgroundImage.WebpSet(550, 750, 1200, 1500, 2200, 2700)"
-     *  alt="$BackgroundImage.Title"
-     *  class="background-image"
-     * >
-     *
-     * Returns an imploded array of the image's webp-Version in the respective size with [size]w hints for the browser, e.g.
-     *  '/path/to/image.jpg-550px.webp 550w, /path/to/image.jpg-800px.webp 800w, '
-     *
-     * @param [type] ...$widths
-     * @return string|null
-     */
-    public function WebpSet(...$widths): ?string
-    {
-        sort($widths);
-        $links = [];
-        foreach ($widths as $width) {
-            $links[] = $this->Webp($width) . ' ' . $width . 'w';
-        }
-        return implode(', ', $links);
-    }
+            if (empty($path)) {
+                continue;
+            }
 
-    /**
-     * SrcSet
-     *
-     * As WebpSet, the method generates a srcset string, but with the original filetype.
-     *
-     * @param [type] ...$widths
-     * @return string|null
-     */
-    public function SrcSet(...$widths): ?string
-    {
-        sort($widths);
-        $links = [];
-        foreach ($widths as $width) {
-            $links[] = $this->owner->ScaleMaxWidth($width)->Url . ' ' . $width . 'w';
+            $srcset[] = sprintf('%s %sw', $path, $width);
         }
-        return implode(', ', $links);
-    }
 
-    /**
-     * WebpPicture
-     *
-     * In Example.ss:
-     * Image.WebpPicture('class="image bg-image" width="550" height="370"', 170, 550, 950, 1200).RAW
-     *
-     * Note: Must me used in template with the .RAW method to prevent the HTML from being escaped.
-     *
-     * @param string $params HTML Parameters for the img tag, except alt="". Do not use $ViewVariables in the Template as they won't be evaluated.
-     * @param integer ...$widths
-     * @return string
-     */
-    public function WebpPicture(string $params, int ...$widths): string
-    {
-        if ($this->owner->Link()) {
-            return '
-                <picture>
-                    <source
-                        type="image/webp"
-                        srcset="' . $this->WebpSet(...$widths) . '"
-                    >
-                    <source
-                        type="' . $this->owner->getMimeType() . '"
-                        srcset="' . $this->SrcSet(...$widths) . '"
-                    >
-                    <img
-                        src="' . $this->owner->ScaleMaxWidth(array_sum($widths) / count($widths))->Url . '" '
-                . $params
-                . ' alt="' . $this->owner->Title . '"
-                    >
-                </picture>';
+        if (empty($srcset)) {
+            return '';
         }
-        return '';
+
+        $type = mime_content_type(PUBLIC_PATH . $path);
+
+        if (!$type) {
+            return '';
+        }
+
+        return HTML::createTag('source', [
+            'type' => $type,
+            'srcset' => implode(', ', $srcset),
+            'sizes' => $this->sizes,
+        ]);
     }
 }
