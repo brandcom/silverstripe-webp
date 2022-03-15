@@ -27,11 +27,11 @@ class Picture extends ViewableData
 
     private array $params;
 
-    private static $casting = [
+    private static array $casting = [
         'forTemplate' => 'HtmlText',
     ];
 
-    private static $default_config = [
+    private static array $default_config = [
         'formats' => ['WebP', 'JPEG'],
         'sizes' => '100vw',
         'widths' => [350, 750, 1500],
@@ -81,7 +81,7 @@ class Picture extends ViewableData
      * @link https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/sizes#html
      *
      * E.g. "(min-width: 280px) 100vw, (min-width: 640px) 50vw"
-     * -> The Picture is supposed to be shown fullscreen on smaller screens. On screens largen than 640px,
+     * -> The Picture is supposed to be shown fullscreen on smaller screens. On screens larger than 640px,
      * the image is shown at 50% screen width.
      */
     public function setSizes(string $sizes): Picture
@@ -122,6 +122,18 @@ class Picture extends ViewableData
     }
 
     /**
+     * Images will be lazily loaded by default.
+     * Set to a false or 0 to disable lazy loading.
+     */
+    public function setLazyLoading($lazy=true): Picture
+    {
+        $loading = $lazy !== 'false' && $lazy !== '0' ? 'lazy' : 'eager';
+        $this->setParam('loading', $loading);
+
+        return $this;
+    }
+
+    /**
      * Renders the html <picture> element.
      */
     public function forTemplate(): string
@@ -141,6 +153,7 @@ class Picture extends ViewableData
             'width' => $this->image->getWidth(),
             'height' => $this->image->getHeight(),
             'class' => 'bc-picture',
+            'loading' => 'lazy',
         ];
     }
 
