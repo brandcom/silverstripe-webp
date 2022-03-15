@@ -2,6 +2,8 @@
 
 namespace jbennecker\Webp;
 
+use SilverStripe\Control\Director;
+use SilverStripe\Dev\Debug;
 use WebPConvert\WebPConvert;
 
 class WebPConverter
@@ -39,7 +41,12 @@ class WebPConverter
 
         } catch (\Exception $e) {
 
-            throw new \Exception("Could not convert file to WebP: {$e->getMessage()}.");
+            if (!Director::isLive()) {
+                Debug::dump($e->getMessage());
+            }
+
+            return false;
+
         }
     }
 
