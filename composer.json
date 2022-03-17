@@ -8,12 +8,20 @@
         "webp"
     ],
     "require": {
+        "php": "^7.4 || ^8.0",
         "silverstripe/framework": "^4",
-        "rosell-dk/webp-convert": "^2.6.0"
+        "rosell-dk/webp-convert": "^2.6.0",
+        "ext-fileinfo": "*"
     },
     "autoload": {
         "psr-4": {
             "jbennecker\\Webp\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "silverstripe/vendor-plugin": true
         }
     }
 }

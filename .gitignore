@@ -1,4 +1,4 @@
-vendor
 resources
-composer.lock
+vendor
 composer.phar
+composer.lock

@@ -2,12 +2,18 @@
 namespace jbennecker\Webp;
 
 use WebPConvert\WebPConvert;
+use \SilverStripe\ORM\DataExtension;
 
 /**
  * @property \SilverStripe\Assets\Image owner
  */
-class WebpExtension extends \SilverStripe\ORM\DataExtension
+class WebpExtension extends DataExtension
 {
+    public function getPicture()
+    {
+        return Picture::create($this->owner);
+    }
+
     /**
      * Webp
      *
@@ -20,7 +26,7 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
      *
      * @deprecated
      */
-    public function Webp($width=1920): ?string
+    public function Webp($width = 1920): ?string
     {
         $scaledImage = $this->owner->scaleMaxWidth($width);
         if (!$scaledImage) {
@@ -32,7 +38,7 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
             return null;
         }
 
-        $destinationLink = '/webp' . $this->owner->scaleMaxWidth($width)->Link() . '-' . $width. 'px.webp';
+        $destinationLink = '/webp' . $this->owner->scaleMaxWidth($width)->Link() . '-' . $width . 'px.webp';
         $destinationPath = PUBLIC_PATH . $destinationLink;
         $options = [];
 
@@ -40,7 +46,7 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
 
             try {
                 WebPConvert::convert($source, $destinationPath, $options);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 return null;
             }
         }
@@ -66,7 +72,7 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
      *
      * @deprecated
      */
-    public function WebpSet(...$widths) : ?string
+    public function WebpSet(...$widths): ?string
     {
         sort($widths);
         $links = [];
@@ -86,12 +92,12 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
      *
      * @deprecated
      */
-    public function SrcSet(...$widths) : ?string
+    public function SrcSet(...$widths): ?string
     {
         sort($widths);
         $links = [];
         foreach ($widths as $width) {
-            $links[] = $this->owner->ScaleMaxWidth($width)->Url . ' ' . $width . 'w';
+            $links[] = $this->owner->ScaleMaxWidth($width)->getURL() . ' ' . $width . 'w';
         }
         return implode(', ', $links);
     }
@@ -108,28 +114,31 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
      * @param integer ...$widths
      * @return string
      *
-     * @deprecated
+     * @deprecated use $Image.Picture.setCss('my-css').setWidths(123, 456) syntax
      */
-    public function WebpPicture(string $params, int ...$widths) : string
+    public function WebpPicture(string $params, int ...$widths): string
     {
-        if ($this->owner->Link()) {
-            return '
-                <picture>
-                    <source
-                        type="image/webp"
-                        srcset="' . $this->WebpSet(...$widths) . '"
-                    >
-                    <source
-                        type="' . $this->owner->getMimeType() . '"
-                        srcset="' . $this->SrcSet(...$widths) . '"
-                    >
-                    <img
-                        src="' . $this->owner->ScaleMaxWidth(array_sum($widths) / count($widths))->Url . '" '
-                        . $params
-                        . ' alt="' . $this->owner->Title . '"
-                    >
-                </picture>';
+        if (!$this->owner->Link()) {
+
+            return '';
         }
-        return '';
+
+        $picture = Picture::create($this->owner);
+        $picture->setWidths(...$widths);
+        $picture->setAlt($this->owner->Title);
+
+        $params = explode('" ', $params);
+        foreach ($params as $param) {
+            $param = explode('=', $param);
+            $key = $param[0] ?? '';
+            $value = $param[1] ?? '';
+            $value = str_replace('"', '', $value);
+
+            if ($key && $value) {
+                $picture->setParam($key, $value);
+            }
+        }
+
+        return $picture->getHtml();
     }
 }
