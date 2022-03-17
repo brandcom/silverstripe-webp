@@ -27,6 +27,10 @@ class Picture extends ViewableData
 
     private array $params;
 
+    private int $width;
+
+    private int $height;
+
     private static array $casting = [
         'forTemplate' => 'HtmlText',
     ];
@@ -47,6 +51,8 @@ class Picture extends ViewableData
         $this->formats = $config->formats ?? self::$default_config['formats'];
         $this->widths = $config->widths ?? self::$default_config['widths'];
         $this->sizes = $config->sizes ?? self::$default_config['sizes'];
+        $this->width = $this->image->getWidth();
+        $this->height = $this->image->getHeight();
         $this->params = $this->getDefaultParams();
     }
 
@@ -121,6 +127,20 @@ class Picture extends ViewableData
         return $this;
     }
 
+    public function setWidth(int $width): Picture
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    public function setHeight(int $height): Picture
+    {
+        $this->height = $height;
+
+        return $this;
+    }
+
     /**
      * Images will be lazily loaded by default.
      * Set to a false or 0 to disable lazy loading.
@@ -150,8 +170,6 @@ class Picture extends ViewableData
     {
         return [
             'alt' => $this->image->getTitle(),
-            'width' => $this->image->getWidth(),
-            'height' => $this->image->getHeight(),
             'class' => 'bc-picture',
             'loading' => 'lazy',
         ];
@@ -184,6 +202,8 @@ class Picture extends ViewableData
     private function createImgElement(): string
     {
         $params = $this->params;
+        $params['width'] = $this->width;
+        $params['height'] = $this->height;
         $params['src'] = $this->image->ScaleWidth(reset($this->widths))->getURL();
 
         return HTML::createTag('img', $params);
