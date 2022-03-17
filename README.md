@@ -99,3 +99,16 @@ $MyImage.Picture.setClass("w-full border shadow-lg").setParam("title", "This is 
 #### setLazyLoading($lazy = true)
 
 Control the `loading` attribute. Sets it to `lazy` or `eager`. Defaults to lazy loading.
+
+## FAQ
+
+### Images are missing after running `composer upgrade`
+
+Version `1.0` is using a different API and the old methods have been removed.
+
+You should downgrade to version `0.1`:
+
+```
+"jbennecker/silverstripe-webp": "^0.1"
+```
+
