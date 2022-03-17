@@ -1,6 +1,6 @@
 # silverstripe-webp
 
-The Plugin integrates simple WebP image conversion into Silverstripe.
+The Plugin provides a helper to create html `<picture>` elements in Silverstripe templates. It supports WebP sources out of the box.
 
 ## Requirements
 
@@ -32,7 +32,7 @@ To access the Api, call the `getPicture()` method from the `WebpExtension` like 
 $MyImage.Picture
 ```
 
-This will be enough to output a `<picture>` with standars configuration.
+This will be enough to output a `<picture>` with standard configuration.
 
 ### Api methods
 
