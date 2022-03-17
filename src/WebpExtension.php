@@ -17,6 +17,8 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
      *
      * @param integer $width
      * @return string|null
+     *
+     * @deprecated
      */
     public function Webp($width=1920): ?string
     {
@@ -61,6 +63,8 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
      *
      * @param [type] ...$widths
      * @return string|null
+     *
+     * @deprecated
      */
     public function WebpSet(...$widths) : ?string
     {
@@ -79,6 +83,8 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
      *
      * @param [type] ...$widths
      * @return string|null
+     *
+     * @deprecated
      */
     public function SrcSet(...$widths) : ?string
     {
@@ -101,6 +107,8 @@ class WebpExtension extends \SilverStripe\ORM\DataExtension
      * @param string $params HTML Parameters for the img tag, except alt="". Do not use $ViewVariables in the Template as they won't be evaluated.
      * @param integer ...$widths
      * @return string
+     *
+     * @deprecated
      */
     public function WebpPicture(string $params, int ...$widths) : string
     {
