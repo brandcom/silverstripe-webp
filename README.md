@@ -14,7 +14,7 @@ Install via composer.
 
 `composer require jbennecker/silverstripe-webp`
 
-Register the plugin as a data extension for the `Image` asset:
+Register the plugin as a data extension for the `Assets\Image` class:
 
 ```yaml
 SilverStripe\Assets\Image:
@@ -24,52 +24,69 @@ SilverStripe\Assets\Image:
 
 ## Usage
 
-Convert images on the go in a Template, e.g. `Example.ss`.
+The `jbennecker\Webp\Picture` class provides a flexible Api to manipulate your picture in your template file.
 
-### Create a responsive `<picture>` element
+To access the Api, call the `getPicture()` method from the `WebpExtension` like so:
 
-You can create picture elements with responsive Webp and fallback sources:
-
-`$Image.WebpPicture(string $params, int ...$widths)`
-
-e.g.
-
-`$Image.WebpPicture('class="example" width="100" height="50"', 370, 550, 1200).RAW`
-
-Don't forget to append `.RAW` in order to get unescaped html.
-
-This will create the following html output (for .jpg input):
-
-```html
-<picture>
-    <source
-        type="image/webp"
-        srcset="
-            /webp/.../path/image.jpg-370px.webp   370w,
-            /webp/.../path/image.jpg-550px.webp   550w,
-            /webp/.../path/image.jpg-1200px.webp 1200w
-        "
-    />
-    <source
-        type="image/jpeg"
-        srcset="
-            /.../path/XYZimage__ScaleMaxWidth....jpg  370w,
-            /.../path/XZXimage__ScaleMaxWidth....jpg  550w,
-            /.../path/ABCimage__ScaleMaxWidth....jpg 1200w
-        "
-    />
-    <img src="/.../path/ABXimage__ScaleMaxWidth....jpg" class="example" width="100" height="50" alt="[$Image.Title]" />
-</picture>
+```
+$MyImage.Picture
 ```
 
-The fallback `<img>` will have the average width of your defined `...$widths`.
+This will be enough to output a `<picture>` with standars configuration.
 
-_Note:_ The `alt` parameter is set automatically as no variables can be added to the `$params` string.
+### Api methods
 
-### Get `srcset` string or a single WebP-Link
+The class provides multiple methods that can be called in any order. You can chain the methods, as they return the instance of the Picture class.
 
-You can get `srcset` sources with widths by using the `$Image.WebpSet(120, 550, 700)` method and insert the string in a `srcset` parameter of an `<img>` tag.
+#### setWidths(int ...$widths)
 
-Additionally, you can call `$Image.Webp` to get a single url to the converted Webp file.
+The method will set the widths in the `srcset` attribute in each of the picture's `<source>` tags.
 
-You will find additional help in the `WebpExtension.php` file.
+Example:
+
+```
+$MyImage.Picture.setWidths(150, 230, 550)
+```
+
+#### setSizes(string $sizes)
+
+Set the `sizes` attribute on the `<source>` tags a media-query. Defaults to `100w`.
+
+```
+$MyImage.Picture.setWidths(370, 750, 1920).setSizes("(min-width: 280px) 100vw, (min-width: 640px) 50vw")
+```
+
+#### setFormats(string ...$formats)
+
+Control what `<source>` tags / formats will be present. Defaults to webp and jpeg.
+
+Available options:
+* webp
+* jpg/jpeg
+
+To e.g. disable webp and only get one `<source>` with a jpg `srcset`:
+
+```
+$MyImage.Picture.setFormats('jpg')
+```
+
+#### setAlt(string $value)
+
+Sets the `alt` parameter on the `<img>` tag. Defaults to the Image's title from the CMS.
+
+#### setCss(string $value)
+
+Sets the `class` parameter on the `<img>` tag.
+
+
+#### setParam(string $param, string $value)
+
+Sets a parameter with the name `$param` on the `<img>` tag.
+
+```
+$MyImage.Picture.setClass("w-full border shadow-lg").setParam("title", "This is a title")
+```
+
+#### setLazyLoading($lazy = true)
+
+Control the `loading` attribute. Sets it to `lazy` or `eager`. Defaults to lazy loading.
