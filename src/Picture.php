@@ -161,6 +161,10 @@ class Picture extends ViewableData
     {
         $picture_content = '';
 
+        if (!$this->image->getURL()) {
+            return '';
+        }
+
         foreach ($this->formats as $format) {
 
             $el = $this->createSourceElement($format);
