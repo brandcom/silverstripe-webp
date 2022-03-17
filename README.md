@@ -48,6 +48,8 @@ Example:
 $MyImage.Picture.setWidths(150, 230, 550)
 ```
 
+Defaults to `350, 750, 1500`.
+
 #### setSizes(string $sizes)
 
 Set the `sizes` attribute on the `<source>` tags a media-query. Defaults to `100w`.
@@ -78,6 +80,13 @@ Sets the `alt` parameter on the `<img>` tag. Defaults to the Image's title from 
 
 Sets the `class` parameter on the `<img>` tag.
 
+#### setWidth(int $width)
+
+Set the `width` attribute on the `<img>` tag. Defaults to the Image's original width.
+
+#### setHeight(int $height)
+
+Set the `height` attribute on the `<img>` tag. Defaults to the Image's original height.
 
 #### setParam(string $param, string $value)
 
