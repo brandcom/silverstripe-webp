@@ -4,9 +4,9 @@ The Plugin provides a helper to create html `<picture>` elements in Silverstripe
 
 ## Requirements
 
--   SilverStripe 4.x
--   rosell-dk/webp-convert ^2.6
--   php >= 7.4
+-   SilverStripe 5.x
+-   rosell-dk/webp-convert ^2.9
+-   PHP >= 8.1
 
 ## Install
 
@@ -99,6 +99,14 @@ $MyImage.Picture.setClass("w-full border shadow-lg").setParam("title", "This is 
 #### setLazyLoading($lazy = true)
 
 Control the `loading` attribute. Sets it to `lazy` or `eager`. Defaults to lazy loading.
+
+### The Webp-Method
+
+If you just want to quickly convert the image to .webp and use it in your template, you can use the Webp method:
+
+```ss
+<img src="$MyImage.Webp(900)" alt="">
+```
 
 ## FAQ
 
