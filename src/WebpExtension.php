@@ -28,6 +28,11 @@ class WebpExtension extends DataExtension
             return null;
         }
 
+        // Wenn owner bereits im Webp-Format ist, wird der Link zum skalierten Webp-Bild zurückgeben.
+        if ($scaledImage->getMimeType() == "image/webp") {
+            return $scaledImage->Link();
+        }
+
         $source = PUBLIC_PATH . $scaledImage->Link();
         if (!file_exists($source)) {
             return null;
