@@ -107,16 +107,3 @@ If you just want to quickly convert the image to .webp and use it in your templa
 ```ss
 <img src="$MyImage.Webp(900)" alt="">
 ```
-
-## FAQ
-
-### Images are missing after running `composer upgrade`
-
-Version `1.0` is using a different API and the old methods have been removed.
-
-You should downgrade to version `0.1`:
-
-```
-"jbennecker/silverstripe-webp": "^0.1"
-```
-
