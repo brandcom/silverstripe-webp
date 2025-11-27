@@ -1,13 +1,13 @@
 <?php
 namespace jbennecker\Webp;
 
-use \SilverStripe\ORM\DataExtension;
 use WebPConvert\WebPConvert;
+use SilverStripe\Core\Extension;
 
 /**
  * @property \SilverStripe\Assets\Image owner
  */
-class WebpExtension extends DataExtension
+class WebpExtension extends Extension
 {
     public function getPicture()
     {

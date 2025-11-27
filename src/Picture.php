@@ -2,12 +2,12 @@
 
 namespace jbennecker\Webp;
 
-use SilverStripe\Assets\Image;
-use SilverStripe\Core\Config\Configurable;
 use SilverStripe\View\HTML;
-use SilverStripe\View\ViewableData;
+use SilverStripe\Assets\Image;
+use SilverStripe\Model\ModelData;
+use SilverStripe\Core\Config\Configurable;
 
-class Picture extends ViewableData
+class Picture extends ModelData
 {
     use Configurable;
 
