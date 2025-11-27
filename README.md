@@ -4,9 +4,9 @@ The Plugin provides a helper to create html `<picture>` elements in Silverstripe
 
 ## Requirements
 
--   SilverStripe 5.x
+-   SilverStripe 6.x
 -   rosell-dk/webp-convert ^2.9
--   PHP >= 8.1
+-   PHP >= 8.3
 
 ## Install
 
