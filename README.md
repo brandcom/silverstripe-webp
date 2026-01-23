@@ -4,9 +4,9 @@ The Plugin provides a helper to create html `<picture>` elements in Silverstripe
 
 ## Requirements
 
--   SilverStripe 5.x
--   rosell-dk/webp-convert ^2.9
--   PHP >= 8.1
+- SilverStripe 6.x
+- rosell-dk/webp-convert ^2.9.3
+- PHP >= 8.3
 
 ## Install
 
@@ -63,8 +63,9 @@ $MyImage.Picture.setWidths(370, 750, 1920).setSizes("(min-width: 280px) 100vw, (
 Control what `<source>` tags / formats will be present. Defaults to webp and jpeg.
 
 Available options:
-* webp
-* jpg/jpeg
+
+- webp
+- jpg/jpeg
 
 To e.g. disable webp and only get one `<source>` with a jpg `srcset`:
 
