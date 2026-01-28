@@ -3,13 +3,29 @@
 namespace jbennecker\Webp;
 
 use SilverStripe\Assets\Image;
-use SilverStripe\Core\Config\Configurable;
 use SilverStripe\View\HTML;
 use SilverStripe\View\ViewableData;
 
-class Picture extends \SilverStripe\View\ViewableData
+// Define a defensive base to avoid parse-time fatals if framework isn't loaded yet
+if (class_exists(\SilverStripe\View\ViewableData::class)) {
+    abstract class PictureBase extends \SilverStripe\View\ViewableData {}
+} else {
+    abstract class PictureBase {}
+}
+
+// Defensive trait wrapper to avoid parse-time fatals if Configurable isn't available yet
+if (trait_exists(\SilverStripe\Core\Config\Configurable::class)) {
+    trait WebpConfigurable
+    {
+        use \SilverStripe\Core\Config\Configurable;
+    }
+} else {
+    trait WebpConfigurable {}
+}
+
+class Picture extends PictureBase
 {
-    use Configurable;
+    use WebpConfigurable;
 
     private Image $image;
 
@@ -45,7 +61,8 @@ class Picture extends \SilverStripe\View\ViewableData
     {
         parent::__construct();
 
-        $config = self::config();
+        // Read config if available via trait; otherwise fall back to defaults
+        $config = method_exists(static::class, 'config') ? static::config() : null;
 
         $this->image = $image;
         $this->formats = $config->formats ?? self::$default_config['formats'];

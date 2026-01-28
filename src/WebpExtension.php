@@ -2,17 +2,18 @@
 
 namespace jbennecker\Webp;
 
-use \SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use WebPConvert\WebPConvert;
 
 /**
  * @property \SilverStripe\Assets\Image owner
  */
-class WebpExtension extends DataExtension
+class WebpExtension extends Extension
 {
     public function getPicture(): Picture
     {
-        return Picture::create($this->owner);
+        // Instantiate directly to avoid reliance on ViewableData::create()
+        return new Picture($this->owner);
     }
 
     /**
