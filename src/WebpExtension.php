@@ -1,4 +1,5 @@
 <?php
+
 namespace jbennecker\Webp;
 
 use \SilverStripe\ORM\DataExtension;
@@ -9,7 +10,7 @@ use WebPConvert\WebPConvert;
  */
 class WebpExtension extends DataExtension
 {
-    public function getPicture()
+    public function getPicture(): Picture
     {
         return Picture::create($this->owner);
     }
@@ -20,7 +21,7 @@ class WebpExtension extends DataExtension
      * @param int $width Die maximale Breite, auf die das Bild skaliert werden soll.
      * @return string|null Pfad zum .webp-Bild, geeignet für das 'src'-Attribut eines <img>-Tags.
      */
-    public function Webp($width): ?string
+    public function Webp(int $width): ?string
     {
         // Skaliert das Bild auf die maximale Breite
         $scaledImage = $this->owner->scaleMaxWidth($width);
@@ -45,6 +46,10 @@ class WebpExtension extends DataExtension
 
         // Überprüft, ob eine neue Konvertierung notwendig ist
         if (!file_exists($destinationPath) || filemtime($source) > filemtime($destinationPath)) {
+            $dir = dirname($destinationPath);
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0775, true);
+            }
             WebPConvert::convert($source, $destinationPath, $options);
         }
 

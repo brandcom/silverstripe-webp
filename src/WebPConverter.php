@@ -15,7 +15,7 @@ class WebPConverter
      */
     private ?string $folder;
 
-    public function __construct(string $input_path, array $options=[])
+    public function __construct(string $input_path, array $options = [])
     {
         if (!file_exists($input_path)) {
             throw new \Exception("File {$input_path} does not exist");
@@ -35,10 +35,15 @@ class WebPConverter
 
         try {
 
-            WebPConvert::convert($this->input_path, $this->getPath(), $options, $logger);
+            $targetPath = $this->getPath();
+            $targetDir = dirname($targetPath);
+            if (!is_dir($targetDir)) {
+                @mkdir($targetDir, 0775, true);
+            }
 
-            return file_exists($this->getPath());
+            WebPConvert::convert($this->input_path, $targetPath, $options, $logger);
 
+            return file_exists($targetPath);
         } catch (\Exception $e) {
 
             if (!Director::isLive()) {
@@ -46,7 +51,6 @@ class WebPConverter
             }
 
             return false;
-
         }
     }
 
@@ -60,5 +64,4 @@ class WebPConverter
     {
         return new \SplFileInfo($this->getPath());
     }
-
 }
