@@ -12,7 +12,7 @@ The Plugin provides a helper to create html `<picture>` elements in Silverstripe
 
 Install via composer.
 
-`composer require jbennecker/silverstripe-webp`
+`composer require jbennecker/silverstripe-webp:ss6`
 
 Register the plugin as a data extension for the `Assets\Image` class:
 
