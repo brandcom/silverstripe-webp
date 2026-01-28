@@ -7,7 +7,7 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\View\HTML;
 use SilverStripe\View\ViewableData;
 
-class Picture extends ViewableData
+class Picture extends \SilverStripe\View\ViewableData
 {
     use Configurable;
 
@@ -145,7 +145,7 @@ class Picture extends ViewableData
      * Images will be lazily loaded by default.
      * Set to a false or 0 to disable lazy loading.
      */
-    public function setLazyLoading($lazy=true): Picture
+    public function setLazyLoading($lazy = true): Picture
     {
         $loading = $lazy !== 'false' && $lazy !== '0' ? 'lazy' : 'eager';
         $this->setParam('loading', $loading);
