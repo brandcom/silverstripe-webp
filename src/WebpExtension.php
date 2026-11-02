@@ -12,8 +12,7 @@ class WebpExtension extends Extension
 {
     public function getPicture(): Picture
     {
-        // Instantiate directly to avoid reliance on ViewableData::create()
-        return new Picture($this->owner);
+        return new Picture($this->getOwner());
     }
 
     /**
@@ -25,7 +24,7 @@ class WebpExtension extends Extension
     public function Webp(int $width): ?string
     {
         // Skaliert das Bild auf die maximale Breite
-        $scaledImage = $this->owner->scaleMaxWidth($width);
+        $scaledImage = $this->getOwner()->scaleMaxWidth($width);
         if (!$scaledImage) {
             return null;
         }
@@ -40,7 +39,7 @@ class WebpExtension extends Extension
             return null;
         }
 
-        $destinationLink = '/webp/' . $this->owner->ID . '_' . $width . '_' . pathinfo($this->owner->Link())['filename'] . '.webp';
+        $destinationLink = '/webp/' . $this->getOwner()->ID . '_' . $width . '_' . pathinfo($this->getOwner()->Link())['filename'] . '.webp';
         $destinationLink = strtolower($destinationLink);
         $destinationPath = PUBLIC_PATH . $destinationLink;
         $options = [];
